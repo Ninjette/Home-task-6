@@ -1,9 +1,8 @@
 section.section-search
-	hr
-	h2.text-center Movie search
+	.section-search__title Movie search
 	form.form-inline.text-center
 		.search
-			input( type="text", ng-model="input").form-control
+			input( type="text", ng-model="input" ,required).form-control
 			button(ng-click="searchFunc(input); show='true'").btn.btn-success submit
 	.container
 		.row
@@ -30,6 +29,7 @@ section.section-search
 				h3 Name: {{item.Title}}
 				h5 Type {{item.Type}}
 				h5 Year: {{item.Year}}
+				a(ng-href="#/item_{{item.Title}}").movie__link.btn.btn-info more info
 
 		//- search result
 		.search-result
@@ -38,8 +38,8 @@ section.section-search
 					h3 Name: {{movie.Title}}
 					h5 Type {{movie.Type}}
 					h5 Year: {{movie.Year}}
-					.btn.btn-info(ng-click="addToDesired(movie)") add to desired
-					a(href="#/item", ng-click="getInfo(movie.Title)").movie__link.btn.btn-info more info
+					.btn.btn-info.movie__desired(ng-click="addToDesired(movie)") add to desired
+					a(ng-href="#/item_{{movie.Title}}").movie__link.btn.btn-info more info
 		ul.pagination
 			li.pagination__item(ng-repeat="page in pages")
 				button(ng-click="changePage(page.num)").pagination__number {{page.num}}

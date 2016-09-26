@@ -6,12 +6,6 @@ function mainController($scope, dataService){
 	$scope.propertyName = "Year";
 	let inputData;
 
-	$scope.getInfo = function(title){
-		dataService.getItemJSON((response, title) =>{
-			$scope.item = response.data;
-		}, title);
-	};
-
 	$scope.changePage = function(page){
 		dataService.getPageJSON((response, inputData) =>{
 			$scope.movies = response.data.Search;
