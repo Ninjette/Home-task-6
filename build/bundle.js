@@ -186,17 +186,9 @@
 	function itemController($scope, dataService, $location) {
 		//rating
 		$scope.rating = 0;
-
-		// target element
 		var ratingDiv = document.querySelector('.rating');
-
-		// current rating, or initial rating
 		var currentRating = 0;
-
-		// max rating, i.e. number of stars you want
 		var maxRating = 5;
-
-		// callback to run after setting the rating
 		var callback = function callback(rating) {
 			$scope.rating = rating;
 			console.log($scope.rating);
@@ -214,13 +206,44 @@
 			}, title);
 		};
 		$scope.getInfo(titleName);
+		$scope.reviewId = 0;
 		$scope.reviews = [];
+		$scope.reviewMask = 'review_';
+
+		$scope.showReviews = function () {
+			$scope.lsLength = localStorage.length;
+			if ($scope.lsLength > 0) {
+				for (var i = 0; i < $scope.lsLength; i++) {
+					var key = localStorage.key(i);
+					if (key.indexOf($scope.reviewMask) == 0) {
+						$scope.reviews.push(JSON.parse(localStorage.getItem(key)));
+						var lsKey = localStorage.getItem(key);
+					}
+				}
+			};
+		};
+		$scope.showReviews();
+
 		$scope.addReview = function (review) {
+			//Local storage saving
+			if (!$scope.hasSameId) {
+				var objectLength = Object.keys($scope.reviews).length;
+				if (objectLength > 0) {
+					$scope.reviewId = objectLength;
+				} else {
+					$scope.reviewId = 0;
+				};
+				// movie.attrID = $scope.elemMask + $scope.elemId; what is it
+
+				localStorage.setItem($scope.reviewMask + $scope.reviewId, JSON.stringify({ text: review, rating: $scope.rating }));
+			};
 			$scope.reviews.push({
 				text: review,
 				rating: $scope.rating
 			});
 			$scope.reviewText = '';
+
+			// localStorage.setItem($scope.reviewMask + $scope.reviewId, JSON.stringify({title: 'my title 228'}));
 		};
 	}
 
