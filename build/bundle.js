@@ -111,6 +111,7 @@
 		$scope.changePage = function (page) {
 			dataService.getPageJSON(function (response, inputData) {
 				$scope.movies = response.data.Search;
+				$scope.renderReviewsAmount($scope.movies);
 			}, inputData, page);
 		};
 
@@ -119,6 +120,7 @@
 			inputData = input;
 			dataService.getJSON(function (response, input) {
 				$scope.movies = response.data.Search;
+
 				var results = response.data.totalResults;
 				if (results.length > 1) {
 					var pagesAmount = results.substring(0, results.length - 1);
@@ -127,7 +129,24 @@
 						$scope.pages.push({ num: i + 1 });
 					};
 				}
+				$scope.renderReviewsAmount($scope.movies);
 			}, input);
+		};
+
+		$scope.renderReviewsAmount = function (items) {
+			$scope.lsLength = localStorage.length;
+			if ($scope.lsLength > 0) {
+				for (var j = 0; j < items.length; j++) {
+					var itemID = items[j].imdbID;
+					items[j].reviews = 0;
+					for (var i = 0; i < $scope.lsLength; i++) {
+						var key = localStorage.key(i);
+						if (key.indexOf(itemID) > 0) {
+							items[j].reviews += 1;
+						}
+					}
+				};
+			}
 		};
 
 		// Desired
@@ -144,8 +163,10 @@
 					}
 				}
 			};
+			$scope.renderReviewsAmount($scope.desired);
 		};
 		$scope.showDesired();
+
 		$scope.addToDesired = function (movie) {
 
 			$scope.hasSameId = false;
@@ -189,40 +210,42 @@
 		var ratingDiv = document.querySelector('.rating');
 		var currentRating = 0;
 		var maxRating = 5;
+
 		var callback = function callback(rating) {
 			$scope.rating = rating;
-			console.log($scope.rating);
 		};
 
-		// rating instance
 		var myRating = rating(ratingDiv, currentRating, maxRating, callback);
 
 		var path = $location.path();
 		var titleName = path.slice(6);
+		var reviewID = void 0;
 
 		$scope.getInfo = function (title) {
-			dataService.getItemJSON(function (response, title) {
+			dataService.getItemJSON(function (response, title, callback) {
 				$scope.item = response.data;
+				$scope.showReviews($scope.item.imdbID);
 			}, title);
 		};
+
 		$scope.getInfo(titleName);
 		$scope.reviewId = 0;
 		$scope.reviews = [];
 		$scope.reviewMask = 'review_';
 
-		$scope.showReviews = function () {
+		$scope.showReviews = function (itemID) {
 			$scope.lsLength = localStorage.length;
 			if ($scope.lsLength > 0) {
 				for (var i = 0; i < $scope.lsLength; i++) {
 					var key = localStorage.key(i);
-					if (key.indexOf($scope.reviewMask) == 0) {
+					if (key.indexOf(itemID) > 0) {
 						$scope.reviews.push(JSON.parse(localStorage.getItem(key)));
 						var lsKey = localStorage.getItem(key);
 					}
 				}
 			};
 		};
-		$scope.showReviews();
+		// $scope.showReviews();
 
 		$scope.addReview = function (review) {
 			//Local storage saving
@@ -235,15 +258,14 @@
 				};
 				// movie.attrID = $scope.elemMask + $scope.elemId; what is it
 
-				localStorage.setItem($scope.reviewMask + $scope.reviewId, JSON.stringify({ text: review, rating: $scope.rating }));
+				localStorage.setItem($scope.reviewMask + $scope.reviewId + "_" + $scope.item.imdbID, JSON.stringify({ text: review, rating: $scope.rating }));
 			};
+			//make new review visible on view
 			$scope.reviews.push({
 				text: review,
 				rating: $scope.rating
 			});
 			$scope.reviewText = '';
-
-			// localStorage.setItem($scope.reviewMask + $scope.reviewId, JSON.stringify({title: 'my title 228'}));
 		};
 	}
 

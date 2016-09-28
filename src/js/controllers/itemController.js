@@ -3,44 +3,47 @@ export {itemController}
 function itemController($scope, dataService, $location){
 	//rating
 	$scope.rating = 0;
-	var ratingDiv = document.querySelector('.rating');
-	var currentRating = 0;
-	var maxRating = 5;
-	var callback = function(rating) { 
+	let ratingDiv = document.querySelector('.rating');
+	let currentRating = 0;
+	let maxRating = 5;
+
+	let callback = function(rating) { 
 		$scope.rating = rating;
-		console.log($scope.rating);
 	};
 
-	// rating instance
-	var myRating = rating(ratingDiv, currentRating, maxRating, callback);
+	let myRating = rating(ratingDiv, currentRating, maxRating, callback);
 
 
 	let path = $location.path();
 	let titleName = path.slice(6);
+	let reviewID;
 
 	$scope.getInfo = (title) =>{
-		dataService.getItemJSON((response, title) =>{
+		dataService.getItemJSON((response, title, callback) =>{
 			$scope.item = response.data;
+			$scope.showReviews($scope.item.imdbID);
 		}, title);
 	};
+
 	$scope.getInfo(titleName);
 	$scope.reviewId = 0;
 	$scope.reviews = [];
 	$scope.reviewMask = 'review_';
+
 	
-	$scope.showReviews = () => {
+	$scope.showReviews = (itemID) => {
 		$scope.lsLength = localStorage.length;
 		if ($scope.lsLength > 0) {
 			for(let i = 0; i < $scope.lsLength; i++) {
 				let key = localStorage.key(i);
-				if(key.indexOf($scope.reviewMask) == 0) {
+				if(key.indexOf(itemID) > 0) {
 					$scope.reviews.push(JSON.parse(localStorage.getItem(key)));
 					let lsKey = localStorage.getItem(key);
 				}
 			}
 		};
 	}
-	$scope.showReviews();
+	// $scope.showReviews();
 
 	$scope.addReview = (review) =>{
 		//Local storage saving
@@ -54,16 +57,15 @@ function itemController($scope, dataService, $location){
 			// movie.attrID = $scope.elemMask + $scope.elemId; what is it
 
 			localStorage.setItem(
-				$scope.reviewMask + $scope.reviewId, 
+				$scope.reviewMask + $scope.reviewId + "_" + $scope.item.imdbID, 
 				JSON.stringify({text: review, rating : $scope.rating})
 			);
 		};
+		//make new review visible on view
 		$scope.reviews.push({
 			text: review,
 			rating : $scope.rating
 		});
 		$scope.reviewText = '';
-
-		// localStorage.setItem($scope.reviewMask + $scope.reviewId, JSON.stringify({title: 'my title 228'}));
 	}
 }

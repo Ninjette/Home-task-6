@@ -29,6 +29,7 @@ section.section-search
 				h3 Name: {{item.Title}}
 				h5 Type {{item.Type}}
 				h5 Year: {{item.Year}}
+				h5 reviews: {{item.reviews}}
 				a(ng-href="#/item_{{item.Title}}").movie__link.btn.btn-info more info
 
 		//- search result
@@ -38,6 +39,7 @@ section.section-search
 					h3 Name: {{movie.Title}}
 					h5 Type {{movie.Type}}
 					h5 Year: {{movie.Year}}
+					h5 reviews: {{movie.reviews}}
 					.btn.btn-info.movie__desired(ng-click="addToDesired(movie)") add to desired
 					a(ng-href="#/item_{{movie.Title}}").movie__link.btn.btn-info more info
 		ul.pagination
